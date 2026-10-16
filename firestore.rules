@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Hàm kiểm tra người dùng đã đăng nhập VÀ phải có đuôi @ttgdtxcva.edu.vn
+    function isSchoolMember() {
+      return request.auth != null 
+        && request.auth.token.email_verified == true 
+        && request.auth.token.email.matches('.*@ttgdtxcva[.]edu[.]vn$');
+    }
+
+    // Áp dụng quy tắc bảo mật này cho toàn bộ collection dữ liệu trong hệ thống
+    match /{document=**} {
+      allow read, write: if isSchoolMember();
+    }
+  }
+}
+
